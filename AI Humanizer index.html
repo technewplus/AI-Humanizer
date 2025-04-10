@@ -1,0 +1,1004 @@
+<div class="grace-humanizer">
+  <div class="grace-card">
+    <div class="grace-header">
+      <h2>Grace's AI Humanizer</h2>
+      <p>Transform robotic AI text into genuinely human-sounding content with our advanced natural language algorithms</p>
+    </div>
+    
+    <div class="grace-body">
+      <div class="input-section">
+        <textarea id="grace-input" placeholder="Paste AI-generated content here..."></textarea>
+        <div class="word-count" id="input-count">0 words</div>
+      </div>
+      
+      <div class="controls">
+        <div class="control-group">
+          <label>Humanization Level</label>
+          <select id="grace-level">
+            <option value="subtle">Subtle Polish</option>
+            <option value="balanced" selected>Natural Flow</option>
+            <option value="strong">Complete Rewrite</option>
+            <option value="grace">Grace's Touch</option>
+          </select>
+        </div>
+        
+        <div class="control-group">
+          <label>Writing Style</label>
+          <select id="grace-style">
+            <option value="general">General</option>
+            <option value="casual">Casual/Blog</option>
+            <option value="professional">Professional</option>
+            <option value="academic">Academic</option>
+          </select>
+        </div>
+        
+        <button id="grace-button" class="grace-btn">
+          <span class="btn-icon">🔄</span>
+          <span class="btn-text">Humanize This Text</span>
+        </button>
+      </div>
+      
+      <div class="output-section">
+        <textarea id="grace-output" readonly placeholder="Your humanized content will appear here..."></textarea>
+        <div class="word-count" id="output-count">0 words</div>
+      </div>
+      
+      <div class="grace-results hidden" id="grace-results">
+        <h3>Humanization Analysis</h3>
+        <div class="result-meters">
+          <div class="meter">
+            <div class="meter-label">Original AI Score</div>
+            <div class="meter-bar">
+              <div class="meter-fill ai-score"></div>
+            </div>
+            <div class="meter-value ai-value">0%</div>
+          </div>
+          <div class="meter">
+            <div class="meter-label">Human Likeness</div>
+            <div class="meter-bar">
+              <div class="meter-fill human-score"></div>
+            </div>
+            <div class="meter-value human-value">0%</div>
+          </div>
+        </div>
+        <div class="changes">
+          <div class="change-stat">
+            <span class="change-number" id="word-change">0%</span>
+            <span class="change-label">Words Changed</span>
+          </div>
+          <div class="change-stat">
+            <span class="change-number" id="sentence-change">0%</span>
+            <span class="change-label">Sentences Modified</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Base Styles */
+.grace-humanizer {
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+  line-height: 1.6;
+  color: #333;
+  max-width: 100%;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.grace-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+  overflow: hidden;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.grace-header {
+  background: linear-gradient(135deg, #7f5af0 0%, #2cb67d 100%);
+  color: white;
+  padding: 25px;
+  text-align: center;
+}
+
+.grace-header h2 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.grace-header p {
+  margin: 10px 0 0;
+  opacity: 0.9;
+  font-size: 1rem;
+}
+
+.grace-body {
+  padding: 20px;
+}
+
+/* Input/Output Areas */
+.input-section, .output-section {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 18px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.6;
+  resize: vertical;
+  transition: all 0.3s;
+  box-sizing: border-box;
+  background: #f9f9f9;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #7f5af0;
+  box-shadow: 0 0 0 3px rgba(127, 90, 240, 0.1);
+}
+
+.word-count {
+  position: absolute;
+  bottom: 12px;
+  right: 15px;
+  font-size: 0.8rem;
+  color: #666;
+  background: rgba(255,255,255,0.9);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* Controls */
+.controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.control-group {
+  margin-bottom: 0;
+}
+
+.control-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #f9f9f9;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 12px;
+}
+
+select:focus {
+  outline: none;
+  border-color: #7f5af0;
+  box-shadow: 0 0 0 3px rgba(127, 90, 240, 0.1);
+}
+
+/* Buttons */
+.grace-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #7f5af0 0%, #2cb67d 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.grace-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(127, 90, 240, 0.3);
+}
+
+.grace-btn:active {
+  transform: translateY(0);
+}
+
+.btn-icon {
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+/* Results Section */
+.grace-results {
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin-top: 20px;
+  border: 1px solid #e0e0e0;
+}
+
+.grace-results h3 {
+  margin: 0 0 20px;
+  text-align: center;
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.result-meters {
+  margin-bottom: 25px;
+}
+
+.meter {
+  margin-bottom: 15px;
+}
+
+.meter-label {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.meter-bar {
+  height: 10px;
+  background: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.meter-fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.6s ease-out;
+}
+
+.ai-score {
+  background: linear-gradient(90deg, #ff7e7e, #f94144);
+}
+
+.human-score {
+  background: linear-gradient(90deg, #90be6d, #43aa8b);
+}
+
+.meter-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+.ai-value {
+  color: #f94144;
+}
+
+.human-value {
+  color: #43aa8b;
+}
+
+.changes {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.change-stat {
+  text-align: center;
+}
+
+.change-number {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #7f5af0;
+}
+
+.change-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Loading State */
+.loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* Toast Notification */
+.grace-toast {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  padding: 15px 25px;
+  background: #333;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  z-index: 1000;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.3s;
+  max-width: 300px;
+}
+
+.grace-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .grace-header {
+    padding: 20px 15px;
+  }
+  
+  .grace-header h2 {
+    font-size: 1.6rem;
+  }
+  
+  textarea {
+    min-height: 150px;
+    padding: 15px;
+  }
+  
+  .controls {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .grace-btn {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grace-humanizer {
+    padding: 10px;
+  }
+  
+  .grace-header {
+    padding: 15px 10px;
+  }
+  
+  .grace-header h2 {
+    font-size: 1.4rem;
+  }
+  
+  .grace-body {
+    padding: 15px;
+  }
+  
+  textarea {
+    min-height: 120px;
+    font-size: 0.95rem;
+  }
+  
+  .btn-icon {
+    font-size: 1rem;
+  }
+  
+  .btn-text {
+    font-size: 0.95rem;
+  }
+  
+  .grace-results h3 {
+    font-size: 1.1rem;
+  }
+  
+  .change-number {
+    font-size: 1.3rem;
+  }
+}
+
+.hidden {
+  display: none;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // DOM Elements
+  const graceInput = document.getElementById('grace-input');
+  const graceOutput = document.getElementById('grace-output');
+  const graceButton = document.getElementById('grace-button');
+  const graceResults = document.getElementById('grace-results');
+  const inputCount = document.getElementById('input-count');
+  const outputCount = document.getElementById('output-count');
+  const wordChange = document.getElementById('word-change');
+  const sentenceChange = document.getElementById('sentence-change');
+  const aiScoreBar = document.querySelector('.ai-score');
+  const humanScoreBar = document.querySelector('.human-score');
+  const aiScoreValue = document.querySelector('.ai-value');
+  const humanScoreValue = document.querySelector('.human-value');
+  
+  // Grace's Advanced Humanization Patterns
+  const gracePatterns = {
+    // More sophisticated word replacements
+    advancedReplacements: {
+      "utilize": ["use", "work with", "put to use", "employ", "make use of"],
+      "therefore": ["so", "thus", "because of this", "as a result", "consequently"],
+      "however": ["but", "though", "on the flip side", "that said", "then again"],
+      "furthermore": ["also", "what's more", "beyond that", "moreover", "additionally"],
+      "in order to": ["to", "so we can", "for"],
+      "commence": ["begin", "start", "kick off", "launch"],
+      "terminate": ["end", "stop", "halt", "call it quits"],
+      "individual": ["person", "someone", "one", "human being"],
+      "purchase": ["buy", "get", "pick up", "snag", "grab"],
+      "reside": ["live", "stay", "dwell", "have a place"],
+      "obtain": ["get", "acquire", "score", "come by"],
+      "inquire": ["ask", "question", "check", "find out"],
+      "approximately": ["about", "around", "roughly", "close to"],
+      "subsequently": ["later", "afterwards", "then", "next"],
+      "prior to": ["before", "earlier than", "ahead of"],
+      "with regard to": ["about", "regarding", "concerning", "on the subject of"],
+      "in the event that": ["if", "should", "when"],
+      "at this point in time": ["now", "currently", "at present"],
+      "as a matter of fact": ["in fact", "actually", "truth be told"],
+      "it is important to note that": ["note that", "remember", "keep in mind"]
+    },
+    
+    // Sentence restructuring patterns
+    sentenceRestructures: [
+      { 
+        pattern: /(\w+)(\s+is\s+)(\w+)(\s+that\s+)/gi, 
+        replace: ["What's interesting is $3 $1 that ", 
+                 "You'll find $1 is $3 and ", 
+                 "It turns out $1 is $3, meaning "]
+      },
+      {
+        pattern: /(There\s+are\s+)(\w+)(\s+that\s+)/gi,
+        replace: ["You can find $2 that ", 
+                 "We see $2 that ", 
+                 "$2 exist that "]
+      },
+      {
+        pattern: /(The\s+\w+\s+of\s+\w+\s+)(\w+)(\s+)/gi,
+        replace: ["$2 $1", 
+                 "When we look at $1, $2 ",
+                 "$2, which comes from $1"]
+      }
+    ],
+    
+    // Natural speech patterns
+    naturalSpeech: {
+      fillers: ["well", "you know", "I mean", "like", "sort of", "kind of", "basically"],
+      corrections: ["or rather", "I should say", "to be precise", "more accurately"],
+      emphasis: ["really", "actually", "absolutely", "totally", "completely"]
+    },
+    
+    // Writing style adjustments
+    styleAdjustments: {
+      casual: {
+        sentenceStarters: ["Here's the thing -", "You know what?", "Funny enough,", "Honestly,"],
+        connectors: ["Anyway,", "So,", "And guess what?", "By the way,"],
+        endings: ["you know?", "right?", "makes sense?", "cool?"]
+      },
+      professional: {
+        sentenceStarters: ["Our analysis shows", "The data indicates", "From our perspective,"],
+        connectors: ["Furthermore,", "In addition,", "Consequently,"],
+        endings: ["based on our findings.", "according to industry standards.", "per our research."]
+      },
+      academic: {
+        sentenceStarters: ["Research demonstrates", "Studies indicate", "The literature suggests"],
+        connectors: ["Moreover,", "Notwithstanding,", "In contrast,"],
+        endings: ["as evidenced by the data.", "per the existing scholarship.", "based on peer-reviewed studies."]
+      }
+    }
+  };
+  
+  // Event Listeners
+  graceInput.addEventListener('input', updateWordCount);
+  graceButton.addEventListener('click', humanizeWithGrace);
+  
+  // Update word count
+  function updateWordCount() {
+    const text = graceInput.value.trim();
+    const wordCount = text ? text.split(/\s+/).length : 0;
+    inputCount.textContent = `${wordCount} words`;
+  }
+  
+  // Main humanization function
+  function humanizeWithGrace() {
+    const originalText = graceInput.value.trim();
+    const level = document.getElementById('grace-level').value;
+    const style = document.getElementById('grace-style').value;
+    
+    if (!originalText) {
+      showToast('Please enter some text to humanize');
+      return;
+    }
+    
+    // Show loading state
+    graceButton.disabled = true;
+    graceButton.classList.add('loading');
+    graceButton.innerHTML = '<span class="btn-text">Grace is working her magic...</span>';
+    graceResults.classList.add('hidden');
+    
+    // Process with slight delay for UI
+    setTimeout(() => {
+      try {
+        // Track changes for metrics
+        let changeMetrics = {
+          originalWords: originalText.split(/\s+/).length,
+          wordsChanged: 0,
+          originalSentences: originalText.split(/[.!?]+/).filter(s => s.trim().length > 0).length,
+          sentencesChanged: 0
+        };
+        
+        let humanizedText = originalText;
+        
+        // Apply Grace's humanization based on level
+        switch(level) {
+          case 'subtle':
+            humanizedText = applyGraceSubtle(humanizedText, changeMetrics);
+            break;
+          case 'balanced':
+            humanizedText = applyGraceBalanced(humanizedText, changeMetrics);
+            break;
+          case 'strong':
+            humanizedText = applyGraceStrong(humanizedText, changeMetrics);
+            break;
+          case 'grace':
+            humanizedText = applyGraceFull(humanizedText, changeMetrics);
+            break;
+        }
+        
+        // Apply style adjustments
+        humanizedText = applyWritingStyle(humanizedText, style);
+        
+        // Update output
+        graceOutput.value = humanizedText;
+        updateOutputWordCount(humanizedText);
+        
+        // Calculate and show metrics
+        calculateMetrics(changeMetrics, originalText, humanizedText);
+        
+        showToast('Humanization complete! Your text now sounds genuinely human');
+      } catch (error) {
+        console.error('Grace encountered an error:', error);
+        showToast('Something went wrong. Please try again.');
+      } finally {
+        graceButton.disabled = false;
+        graceButton.classList.remove('loading');
+        graceButton.innerHTML = '<span class="btn-icon">🔄</span><span class="btn-text">Humanize This Text</span>';
+      }
+    }, 50);
+  }
+  
+  // Grace's humanization levels
+  function applyGraceSubtle(text, metrics) {
+    let result = text;
+    
+    // Word replacements
+    result = replaceWordsGracefully(result, metrics, 0.3);
+    
+    // Basic sentence variation
+    const sentences = result.split(/(?<=[.!?])\s+/);
+    for (let i = 0; i < sentences.length; i++) {
+      if (i % 6 === 0 && sentences[i].length > 0) {
+        const before = sentences[i];
+        sentences[i] = varySentenceGracefully(sentences[i]);
+        if (before !== sentences[i]) metrics.sentencesChanged++;
+      }
+    }
+    result = sentences.join(' ');
+    
+    return result;
+  }
+  
+  function applyGraceBalanced(text, metrics) {
+    let result = applyGraceSubtle(text, metrics);
+    
+    // More aggressive word replacement
+    result = replaceWordsGracefully(result, metrics, 0.5);
+    
+    // Sentence restructuring
+    const sentences = result.split(/(?<=[.!?])\s+/);
+    for (let i = 0; i < sentences.length; i++) {
+      if (sentences[i].length > 0 && Math.random() < 0.4) {
+        const before = sentences[i];
+        sentences[i] = restructureSentenceGracefully(sentences[i]);
+        if (before !== sentences[i]) metrics.sentencesChanged++;
+      }
+    }
+    result = sentences.join(' ');
+    
+    // Add some natural speech patterns
+    if (Math.random() < 0.3) {
+      result = addNaturalSpeechPatterns(result, metrics);
+    }
+    
+    return result;
+  }
+  
+  function applyGraceStrong(text, metrics) {
+    let result = applyGraceBalanced(text, metrics);
+    
+    // Very aggressive word replacement
+    result = replaceWordsGracefully(result, metrics, 0.7);
+    
+    // Break up long sentences
+    result = result.replace(/([^.!?]+[.!?])/g, (match) => {
+      if (match.split(' ').length > 20) {
+        metrics.sentencesChanged++;
+        return breakLongSentenceGracefully(match);
+      }
+      return match;
+    });
+    
+    // More conversational elements
+    const sentences = result.split(/(?<=[.!?])\s+/);
+    for (let i = 0; i < sentences.length; i++) {
+      if (sentences[i].length > 0 && i % 4 === 0) {
+        const before = sentences[i];
+        sentences[i] = addConversationalGrace(sentences[i]);
+        if (before !== sentences[i]) metrics.sentencesChanged++;
+      }
+    }
+    result = sentences.join(' ');
+    
+    // More natural quirks
+    result = addNaturalQuirksGracefully(result, metrics, 0.5);
+    
+    return result;
+  }
+  
+  function applyGraceFull(text, metrics) {
+    let result = applyGraceStrong(text, metrics);
+    
+    // Maximum word replacement
+    result = replaceWordsGracefully(result, metrics, 0.9);
+    
+    // Personal interjections
+    const sentences = result.split(/(?<=[.!?])\s+/);
+    for (let i = 0; i < sentences.length; i++) {
+      if (sentences[i].length > 0 && i % 5 === 0) {
+        const before = sentences[i];
+        sentences[i] = addPersonalRemarkGracefully(sentences[i]);
+        if (before !== sentences[i]) metrics.sentencesChanged++;
+      }
+    }
+    result = sentences.join(' ');
+    
+    // Thoughtful imperfections
+    result = addThoughtfulImperfectionsGracefully(result, metrics);
+    
+    return result;
+  }
+  
+  // Grace's helper functions
+  function replaceWordsGracefully(text, metrics, intensity) {
+    let result = text;
+    const words = result.split(/\s+/);
+    let changes = 0;
+    
+    for (const [formalWord, alternatives] of Object.entries(gracePatterns.advancedReplacements)) {
+      const regex = new RegExp(`\\b${formalWord}\\b`, 'gi');
+      if (regex.test(result) && Math.random() < intensity) {
+        const replacement = alternatives[Math.floor(Math.random() * alternatives.length)];
+        result = result.replace(regex, (match) => {
+          changes++;
+          return match === match.toUpperCase() ? 
+            replacement.toUpperCase() : 
+            (match[0] === match[0].toUpperCase() ? 
+              replacement[0].toUpperCase() + replacement.slice(1) : 
+              replacement);
+        });
+      }
+    }
+    
+    metrics.wordsChanged += changes;
+    return result;
+  }
+  
+  function varySentenceGracefully(sentence) {
+    if (sentence.length > 40 && Math.random() > 0.3) {
+      const starters = [
+        "Interestingly, ", "Surprisingly, ", "You'll notice ", 
+        "What's fascinating is ", "Here's something: ", "Consider this: "
+      ];
+      const starter = starters[Math.floor(Math.random() * starters.length)];
+      return starter + sentence.substring(0, 1).toLowerCase() + sentence.substring(1);
+    }
+    return sentence;
+  }
+  
+  function restructureSentenceGracefully(sentence) {
+    // Try pattern-based restructuring first
+    for (const restructure of gracePatterns.sentenceRestructures) {
+      if (restructure.pattern.test(sentence) {
+        const replacement = restructure.replace[Math.floor(Math.random() * restructure.replace.length)];
+        return sentence.replace(restructure.pattern, replacement);
+      }
+    }
+    
+    // Fallback to simpler variation
+    return varySentenceGracefully(sentence);
+  }
+  
+  function addNaturalSpeechPatterns(text, metrics) {
+    let result = text;
+    const sentences = result.split(/(?<=[.!?])\s+/);
+    
+    // Add fillers
+    if (sentences.length > 2 && Math.random() < 0.4) {
+      const filler = gracePatterns.naturalSpeech.fillers[
+        Math.floor(Math.random() * gracePatterns.naturalSpeech.fillers.length)
+      ];
+      const insertAt = Math.floor(Math.random() * (sentences.length - 1)) + 1;
+      sentences.splice(insertAt, 0, filler.charAt(0).toUpperCase() + filler.slice(1) + ",");
+      metrics.sentencesChanged++;
+    }
+    
+    // Add corrections
+    if (Math.random() < 0.2) {
+      const correction = gracePatterns.naturalSpeech.corrections[
+        Math.floor(Math.random() * gracePatterns.naturalSpeech.corrections.length)
+      ];
+      const insertAt = Math.floor(Math.random() * sentences.length);
+      const words = sentences[insertAt].split(' ');
+      if (words.length > 3) {
+        const wordPos = Math.floor(Math.random() * (words.length - 2)) + 1;
+        words.splice(wordPos, 0, correction);
+        sentences[insertAt] = words.join(' ');
+        metrics.wordsChanged += 1;
+      }
+    }
+    
+    return sentences.join(' ');
+  }
+  
+  function breakLongSentenceGracefully(sentence) {
+    const connectors = [
+      "which means", "so", "because", "as", "since", 
+      "resulting in", "leading to", "therefore"
+    ];
+    const connector = connectors[Math.floor(Math.random() * connectors.length)];
+    
+    const words = sentence.split(' ');
+    const breakAt = Math.floor(words.length / 2);
+    const firstPart = words.slice(0, breakAt).join(' ');
+    const secondPart = words.slice(breakAt).join(' ');
+    
+    return `${firstPart}, ${connector} ${secondPart}`;
+  }
+  
+  function addConversationalGrace(sentence) {
+    const leadIns = [
+      "You'll notice", "It's interesting", "What's fascinating", 
+      "I've observed", "Many find", "From experience,"
+    ];
+    const leadIn = leadIns[Math.floor(Math.random() * leadIns.length)];
+    return `${leadIn} ${sentence.substring(0, 1).toLowerCase()}${sentence.substring(1)}`;
+  }
+  
+  function addNaturalQuirksGracefully(text, metrics, chance) {
+    let result = text;
+    
+    // Add occasional ellipsis for pause
+    if (Math.random() < chance) {
+      result = result.replace(/(,|\.)\s/g, (match) => {
+        return Math.random() < 0.05 ? '... ' : match;
+      });
+    }
+    
+    // Add occasional repeated words for emphasis
+    if (Math.random() < chance) {
+      const words = result.split(' ');
+      if (words.length > 10) {
+        const repeatAt = Math.floor(Math.random() * (words.length - 5)) + 3;
+        words.splice(repeatAt, 0, words[repeatAt]);
+        metrics.wordsChanged += 1;
+        result = words.join(' ');
+      }
+    }
+    
+    return result;
+  }
+  
+  function addPersonalRemarkGracefully(sentence) {
+    const remarks = [
+      "From my experience,", "What I've found is", "In my view,",
+      "The way I see it,", "Personally, I think", "In my opinion,"
+    ];
+    const remark = remarks[Math.floor(Math.random() * remarks.length)];
+    return `${remark} ${sentence.substring(0, 1).toLowerCase()}${sentence.substring(1)}`;
+  }
+  
+  function addThoughtfulImperfectionsGracefully(text, metrics) {
+    let result = text;
+    
+    // Add occasional interruption
+    if (Math.random() < 0.15) {
+      const interruptions = ["-", "—", "(", "["];
+      const interruption = interruptions[Math.floor(Math.random() * interruptions.length)];
+      const sentences = result.split(/(?<=[.!?])\s+/);
+      if (sentences.length > 1) {
+        const interruptAt = Math.floor(Math.random() * sentences.length);
+        const words = sentences[interruptAt].split(' ');
+        if (words.length > 5) {
+          const wordPos = Math.floor(Math.random() * (words.length - 3)) + 2;
+          words.splice(wordPos, 0, interruption);
+          sentences[interruptAt] = words.join(' ');
+          metrics.wordsChanged += 1;
+          result = sentences.join(' ');
+        }
+      }
+    }
+    
+    return result;
+  }
+  
+  function applyWritingStyle(text, style) {
+    if (style === 'general') return text;
+    
+    const stylePatterns = gracePatterns.styleAdjustments[style];
+    let result = text;
+    const sentences = result.split(/(?<=[.!?])\s+/);
+    
+    // Apply style starters
+    for (let i = 0; i < sentences.length; i++) {
+      if (i % 5 === 0 && sentences[i].length > 0) {
+        const starter = stylePatterns.sentenceStarters[
+          Math.floor(Math.random() * stylePatterns.sentenceStarters.length)
+        ];
+        sentences[i] = `${starter} ${sentences[i].substring(0, 1).toLowerCase()}${sentences[i].substring(1)}`;
+      }
+    }
+    
+    // Apply connectors
+    if (sentences.length > 2 && Math.random() < 0.4) {
+      const connector = stylePatterns.connectors[
+        Math.floor(Math.random() * stylePatterns.connectors.length)
+      ];
+      const insertAt = Math.floor(Math.random() * (sentences.length - 1)) + 1;
+      sentences.splice(insertAt, 0, connector);
+    }
+    
+    // Apply endings
+    for (let i = 0; i < sentences.length; i++) {
+      if (i % 7 === 0 && sentences[i].length > 0) {
+        const ending = stylePatterns.endings[
+          Math.floor(Math.random() * stylePatterns.endings.length)
+        ];
+        if (!sentences[i].endsWith(ending.replace(/[.!?]/g, ''))) {
+          sentences[i] = sentences[i].replace(/[.!?]+$/, '') + ' ' + ending;
+        }
+      }
+    }
+    
+    return sentences.join(' ');
+  }
+  
+  // Metrics and output
+  function updateOutputWordCount(text) {
+    const wordCount = text ? text.split(/\s+/).length : 0;
+    outputCount.textContent = `${wordCount} words`;
+  }
+  
+  function calculateMetrics(metrics, originalText, humanizedText) {
+    // Calculate word change percentage
+    const wordChangePercent = Math.round(
+      (metrics.wordsChanged / metrics.originalWords) * 100
+    );
+    wordChange.textContent = `${wordChangePercent}%`;
+    
+    // Calculate sentence change percentage
+    const sentenceChangePercent = Math.round(
+      (metrics.sentencesChanged / metrics.originalSentences) * 100
+    );
+    sentenceChange.textContent = `${sentenceChangePercent}%`;
+    
+    // Calculate AI detection score (simulated)
+    const aiScore = calculateAIScore(originalText);
+    const humanScore = 100 - aiScore;
+    
+    aiScoreBar.style.width = `${aiScore}%`;
+    humanScoreBar.style.width = `${humanScore}%`;
+    aiScoreValue.textContent = `${aiScore}%`;
+    humanScoreValue.textContent = `${humanScore}%`;
+    
+    // Show results
+    graceResults.classList.remove('hidden');
+  }
+  
+  function calculateAIScore(text) {
+    let score = 0;
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    
+    // Check for formal/AI words
+    for (const formalWord of Object.keys(gracePatterns.advancedReplacements)) {
+      const regex = new RegExp(`\\b${formalWord}\\b`, 'gi');
+      if (regex.test(text)) {
+        score += 2;
+      }
+    }
+    
+    // Check sentence variety
+    const avgLength = sentences.reduce((sum, s) => sum + s.split(' ').length, 0) / sentences.length;
+    let lengthVariation = 0;
+    for (const s of sentences) {
+      lengthVariation += Math.abs(s.split(' ').length - avgLength);
+    }
+    lengthVariation /= sentences.length;
+    
+    if (lengthVariation < 5) score += 15; // Too uniform
+    else if (lengthVariation < 10) score += 5;
+    
+    // Check for repetitive starts
+    const firstWords = sentences.map(s => s.trim().split(' ')[0].toLowerCase());
+    const uniqueStarters = new Set(firstWords).size;
+    if (uniqueStarters / sentences.length < 0.3) score += 10;
+    
+    // Convert to AI percentage (higher is more AI-like)
+    let aiScore = Math.min(100, Math.max(0, score));
+    
+    // Add some variability
+    aiScore += (Math.random() * 10 - 5);
+    aiScore = Math.min(100, Math.max(0, Math.round(aiScore)));
+    
+    return aiScore;
+  }
+  
+  // Utility functions
+  function showToast(message) {
+    const existing = document.querySelector('.grace-toast');
+    if (existing) document.body.removeChild(existing);
+    
+    const toast = document.createElement('div');
+    toast.className = 'grace-toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    // Show toast
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 10);
+    
+    // Hide after delay
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
+      }, 300);
+    }, 3000);
+  }
+});
+</script>
